@@ -1,0 +1,14 @@
+datasets
+evaluate
+transformers
+scikit-learn
+sentencepiece
+torch
+protobuf
+accelerate
+numpy
+pyyaml
+namegenerator
+jsonlines
+pillow
+configargparse

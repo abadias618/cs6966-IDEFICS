@@ -1,0 +1,6 @@
+# model config file
+
+output-dir: ./runs
+seed: 13
+name: random
+checkpoint: HuggingFaceM4/idefics-9b-instruct

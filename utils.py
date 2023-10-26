@@ -8,6 +8,8 @@ class CustomPipeline:
         self.configs = configs
 
     def __call__(self, prompts):
+        ## from https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+
         # preprocess inputs
         # --batched mode
         inputs = self.processor(prompts, add_end_of_utterance_token=False, return_tensors="pt").to(self.configs.device)
@@ -45,7 +47,7 @@ def get_batch_of_images():
         "./images/dog.jpg",
         "./images/car.jpg",
         "./images/plane.jpg",
-        "./images/skiier.jpg",
+        "./images/skier.jpg",
     ]
 
     images = [Image.open(img_path) for img_path in img_paths]
@@ -53,7 +55,7 @@ def get_batch_of_images():
     return images
 
 
-def make_batch_of_prompts(images):
+def make_batch_of_prompts(images: list[Image.Image]) -> list:
     """
     take in batch of images and make batch of text prompts
     """

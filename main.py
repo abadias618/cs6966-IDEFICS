@@ -12,19 +12,39 @@ from utils import CustomPipeline, get_batch_of_images, make_batch_of_prompts
 
 
 def run(configs):
-    ## from https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+    """
+    run the model
+    """
 
+    # initialize model and processor
     model = IdeficsForVisionText2Text.from_pretrained(configs.checkpoint, torch_dtype=torch.bfloat16).to(configs.device)
     processor = AutoProcessor.from_pretrained(configs.checkpoint)
 
+    # initialize pipeline
     pipeline = CustomPipeline(model, processor, configs)
 
-    prompts = make_batch_of_prompts(get_batch_of_images())
+    # initialize dataset
+    # TODO:
 
-    generated_text = pipeline(prompts)
+    # for each batch of images, generate text and compare with targets
+    # (think classic pytorch eval loop)
+    for batch in range(1):
+        images, targets = get_batch_of_images(), ["cat", "dog", "car", "plane", "skier"]
 
-    for text in enumerate(generated_text):
-        print(text[1])
+        # generate prompts around images
+        prompts = make_batch_of_prompts(images)
+
+        # get model outputs
+        outputs = pipeline(prompts)
+
+        # print outputs
+        for pred, target in zip(outputs, targets):
+            print(f"target: {target}\npredicted: {pred.split('Assistant:')[-1]}")
+
+        # compare outputs with targets
+        # TODO:
+
+    print("done!")
 
 
 if __name__ == "__main__":

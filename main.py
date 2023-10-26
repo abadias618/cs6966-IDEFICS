@@ -8,6 +8,8 @@ import torch
 import yaml
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
+from utils import CustomPipeline
+
 
 def run(configs):
     ## from https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
@@ -15,38 +17,46 @@ def run(configs):
     model = IdeficsForVisionText2Text.from_pretrained(configs.checkpoint, torch_dtype=torch.bfloat16).to(configs.device)
     processor = AutoProcessor.from_pretrained(configs.checkpoint)
 
+    pipeline = CustomPipeline(model, processor, configs)
+
     # We feed to the model an arbitrary sequence of text strings and images. Images can be either URLs or PIL Images.
     prompts = [
         [
             "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/8/86/Id%C3%A9fix.JPG",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/1920px-Cat_August_2010-4.jpg",
             "<end_of_utterance>",
-            "\nAssistant: This picture depicts Idefix, the dog of Obelix in Asterix and Obelix. Idefix is running on the ground.<end_of_utterance>",
-            "\nUser:",
-            "https://static.wikia.nocookie.net/asterix/images/2/25/R22b.gif/revision/latest?cb=20110815073052",
-            "And who is that?<end_of_utterance>",
+            "\nAssistant:",
+        ],
+        [
+            "User: What is in this image?",
+            "https://upload.wikimedia.org/wikipedia/commons/7/77/Sarabi-dog.jpg",
+            "<end_of_utterance>",
+            "\nAssistant:",
+        ],
+        [
+            "User: What is in this image?",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/2011_Toyota_Corolla_--_NHTSA.jpg/1920px-2011_Toyota_Corolla_--_NHTSA.jpg",
+            "<end_of_utterance>",
+            "\nAssistant:",
+        ],
+        [
+            "User: What is in this image?",
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/P-51_Mustang_edit1.jpg/1920px-P-51_Mustang_edit1.jpg",
+            "<end_of_utterance>",
+            "\nAssistant:",
+        ],
+        [
+            "User: What is in this image?",
+            "https://upload.wikimedia.org/wikipedia/commons/8/84/Ski_Famille_-_Family_Ski_Holidays.jpg",
+            "<end_of_utterance>",
             "\nAssistant:",
         ],
     ]
 
-    # --batched mode
-    inputs = processor(prompts, add_end_of_utterance_token=False, return_tensors="pt").to(configs.device)
-    # --single sample mode
-    # inputs = processor(prompts[0], return_tensors="pt").to(device)
+    generated_text = pipeline(prompts)
 
-    # Generation args
-    exit_condition = processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
-    bad_words_ids = processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
-
-    generated_ids = model.generate(
-        **inputs,
-        eos_token_id=exit_condition,
-        bad_words_ids=bad_words_ids,
-        max_length=100,
-    )
-    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
-    for i, t in enumerate(generated_text):
-        print(f"{i}:\n{t}\n")
+    for text in enumerate(generated_text):
+        print(text[1])
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ import torch
 import yaml
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
-from utils import CustomPipeline
+from utils import CustomPipeline, get_batch_of_images, make_batch_of_prompts
 
 
 def run(configs):
@@ -19,39 +19,7 @@ def run(configs):
 
     pipeline = CustomPipeline(model, processor, configs)
 
-    # We feed to the model an arbitrary sequence of text strings and images. Images can be either URLs or PIL Images.
-    prompts = [
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Cat_August_2010-4.jpg/1920px-Cat_August_2010-4.jpg",
-            "<end_of_utterance>",
-            "\nAssistant:",
-        ],
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/7/77/Sarabi-dog.jpg",
-            "<end_of_utterance>",
-            "\nAssistant:",
-        ],
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/2011_Toyota_Corolla_--_NHTSA.jpg/1920px-2011_Toyota_Corolla_--_NHTSA.jpg",
-            "<end_of_utterance>",
-            "\nAssistant:",
-        ],
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/P-51_Mustang_edit1.jpg/1920px-P-51_Mustang_edit1.jpg",
-            "<end_of_utterance>",
-            "\nAssistant:",
-        ],
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/8/84/Ski_Famille_-_Family_Ski_Holidays.jpg",
-            "<end_of_utterance>",
-            "\nAssistant:",
-        ],
-    ]
+    prompts = make_batch_of_prompts(get_batch_of_images())
 
     generated_text = pipeline(prompts)
 

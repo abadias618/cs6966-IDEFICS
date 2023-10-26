@@ -1,3 +1,6 @@
+from PIL import Image
+
+
 class CustomPipeline:
     def __init__(self, model, processor, configs):
         self.model = model
@@ -29,3 +32,41 @@ class CustomPipeline:
         out = self.processor.batch_decode(generated_ids, skip_special_tokens=True)
 
         return out
+
+
+def get_batch_of_images():
+    """
+    temp function to get a batch of images
+    will be replaced with CIFAR10 dataset/dataloader
+    """
+
+    img_paths = [
+        "./images/cat.jpg",
+        "./images/dog.jpg",
+        "./images/car.jpg",
+        "./images/plane.jpg",
+        "./images/skiier.jpg",
+    ]
+
+    images = [Image.open(img_path) for img_path in img_paths]
+
+    return images
+
+
+def make_batch_of_prompts(images):
+    """
+    take in batch of images and make batch of text prompts
+    """
+
+    prompts = []
+    for image in images:
+        prompts.append(
+            [
+                "User: What is in this image?",
+                image,
+                "<end_of_utterance>",
+                "\nAssistant:",
+            ]
+        )
+
+    return prompts

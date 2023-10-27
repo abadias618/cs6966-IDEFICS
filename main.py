@@ -8,45 +8,43 @@ import torch
 import yaml
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
+from utils import CustomPipeline, get_batch_of_images, make_batch_of_prompts
+
 
 def run(configs):
-    ## from https://huggingface.co/HuggingFaceM4/idefics-9b-instruct
+    """
+    run the model
+    """
 
+    # initialize model and processor
     model = IdeficsForVisionText2Text.from_pretrained(configs.checkpoint, torch_dtype=torch.bfloat16).to(configs.device)
     processor = AutoProcessor.from_pretrained(configs.checkpoint)
 
-    # We feed to the model an arbitrary sequence of text strings and images. Images can be either URLs or PIL Images.
-    prompts = [
-        [
-            "User: What is in this image?",
-            "https://upload.wikimedia.org/wikipedia/commons/8/86/Id%C3%A9fix.JPG",
-            "<end_of_utterance>",
-            "\nAssistant: This picture depicts Idefix, the dog of Obelix in Asterix and Obelix. Idefix is running on the ground.<end_of_utterance>",
-            "\nUser:",
-            "https://static.wikia.nocookie.net/asterix/images/2/25/R22b.gif/revision/latest?cb=20110815073052",
-            "And who is that?<end_of_utterance>",
-            "\nAssistant:",
-        ],
-    ]
+    # initialize pipeline
+    pipeline = CustomPipeline(model, processor, configs)
 
-    # --batched mode
-    inputs = processor(prompts, add_end_of_utterance_token=False, return_tensors="pt").to(configs.device)
-    # --single sample mode
-    # inputs = processor(prompts[0], return_tensors="pt").to(device)
+    # initialize dataset
+    # TODO:
 
-    # Generation args
-    exit_condition = processor.tokenizer("<end_of_utterance>", add_special_tokens=False).input_ids
-    bad_words_ids = processor.tokenizer(["<image>", "<fake_token_around_image>"], add_special_tokens=False).input_ids
+    # for each batch of images, generate text and compare with targets
+    # (think classic pytorch eval loop)
+    for batch in range(1):
+        images, targets = get_batch_of_images(), ["cat", "dog", "car", "plane", "skier"]
 
-    generated_ids = model.generate(
-        **inputs,
-        eos_token_id=exit_condition,
-        bad_words_ids=bad_words_ids,
-        max_length=100,
-    )
-    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)
-    for i, t in enumerate(generated_text):
-        print(f"{i}:\n{t}\n")
+        # generate prompts around images
+        prompts = make_batch_of_prompts(images)
+
+        # get model outputs
+        outputs = pipeline(prompts)
+
+        # print outputs
+        for pred, target in zip(outputs, targets):
+            print(f"target: {target}\npredicted: {pred.split('Assistant:')[-1]}")
+
+        # compare outputs with targets
+        # TODO:
+
+    print("done!")
 
 
 if __name__ == "__main__":

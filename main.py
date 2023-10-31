@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 import random
 
 import configargparse
@@ -30,8 +31,8 @@ def run(configs):
 
     # initialize dataset
     # TODO:
-    dataset = CIFAR10(download=False, train = True, transform=ToTensor())
-    test_dataset = CIFAR10(download=False, train=False, transform=ToTensor()) # for whenever we need to test.
+    dataset = CIFAR10(root=os.getenv("DOWNLOAD_DIR"), download=True, train = True, transform=ToTensor())
+    test_dataset = CIFAR10(root=os.getenv("DOWNLOAD_DIR"), download=True, train=False, transform=ToTensor()) # for whenever we need to test.
     torch.manual_seed(43)
     val_size = 5000
     train_size = len(dataset) - val_size
@@ -94,5 +95,8 @@ if __name__ == "__main__":
     # save configs object as yaml
     with open(os.path.join(configs.output_dir, "config.yml"), "w", encoding="utf-8") as file:
         yaml.dump(vars(configs), file)
+
+    #load variables from .env file in current directory
+    load_dotenv()
 
     run(configs)

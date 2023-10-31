@@ -1,6 +1,3 @@
-# LOCAL FILES
-run.sh
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -169,5 +166,5 @@ cython_debug/
 *.log
 runs/*
 
-# run file
-run.sh
+#env file
+vars.env

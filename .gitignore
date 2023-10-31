@@ -166,5 +166,5 @@ cython_debug/
 *.log
 runs/*
 
-# run file
-run.sh
+#env file
+vars.env

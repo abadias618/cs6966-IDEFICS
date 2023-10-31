@@ -1,12 +1,18 @@
 import os
+from dotenv import load_dotenv
 import random
 
 import configargparse
 import namegenerator
 import numpy as np
 import torch
+from torchvision.datasets import CIFAR10
+from torchvision.transforms import ToTensor
+from torch.utils.data import random_split
+from torch.utils.data.dataloader import DataLoader
 import yaml
 from transformers import AutoProcessor, IdeficsForVisionText2Text
+
 
 from utils import CustomPipeline, get_batch_of_images, make_batch_of_prompts
 
@@ -25,7 +31,16 @@ def run(configs):
 
     # initialize dataset
     # TODO:
-
+    dataset = CIFAR10(root=os.getenv("DOWNLOAD_DIR"), download=True, train = True, transform=ToTensor())
+    test_dataset = CIFAR10(root=os.getenv("DOWNLOAD_DIR"), download=True, train=False, transform=ToTensor()) # for whenever we need to test.
+    torch.manual_seed(43)
+    val_size = 5000
+    train_size = len(dataset) - val_size
+    train_ds, val_ds = random_split(dataset, [train_size, val_size])
+    batch_size=128
+    train_loader = DataLoader(train_ds, batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    val_loader = DataLoader(val_ds, batch_size*2, num_workers=4, pin_memory=True)
+    test_loader = DataLoader(test_dataset, batch_size*2, num_workers=4, pin_memory=True)
     # for each batch of images, generate text and compare with targets
     # (think classic pytorch eval loop)
     for batch in range(1):
@@ -80,5 +95,8 @@ if __name__ == "__main__":
     # save configs object as yaml
     with open(os.path.join(configs.output_dir, "config.yml"), "w", encoding="utf-8") as file:
         yaml.dump(vars(configs), file)
+
+    #load variables from .env file in current directory
+    load_dotenv()
 
     run(configs)

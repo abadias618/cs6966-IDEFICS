@@ -62,6 +62,7 @@ def run(configs):
         labels = [dataset_classes[label] for label in labels]
 
         # generate prompts around images
+        # TODO: improve prompts
         prompts = make_batch_of_prompts(images)
 
         # get model outputs
@@ -69,12 +70,11 @@ def run(configs):
 
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
+            print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
+
+            # TODO: make better accuracy method
             if label in pred:
                 num_correct += 1
-
-        # print outputs
-        # for pred, label in zip(outputs, labels):
-        #     print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
 
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
     print("done!")

@@ -14,7 +14,7 @@ from torchvision.transforms.functional import to_pil_image
 from tqdm import tqdm
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
-from utils import CustomPipeline, get_batch_of_images, make_batch_of_prompts
+from utils import CustomPipeline, make_batch_of_prompts
 
 
 def run(configs):
@@ -56,6 +56,7 @@ def run(configs):
     tbar_loader = tqdm(train_loader, dynamic_ncols=True)
     tbar_loader.set_description("train")
 
+    num_correct = 0
     for images, labels in tbar_loader:
         images = [to_pil_image(image) for image in images]
         labels = [dataset_classes[label] for label in labels]
@@ -66,13 +67,16 @@ def run(configs):
         # get model outputs
         outputs = pipeline(prompts)
 
-        # print outputs
-        for pred, label in zip(outputs, labels):
-            print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
-
         # compare outputs with targets
-        # TODO:
+        for pred, label in zip(outputs, labels):
+            if label in pred:
+                num_correct += 1
 
+        # print outputs
+        # for pred, label in zip(outputs, labels):
+        #     print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
+
+    print(f"accuracy: {num_correct / len(train_loader.dataset)}")
     print("done!")
 
 

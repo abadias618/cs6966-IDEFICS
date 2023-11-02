@@ -46,8 +46,7 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     for image in images:
         prompts.append(
             [
-                f"User: choose one of the items of the following list to classify the image given:
-                {",".join(labels)}",
+                f"User: choose one of the items of the following list to classify the image given:{",".join(labels)}",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",

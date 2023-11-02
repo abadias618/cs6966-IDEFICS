@@ -81,7 +81,7 @@ def run(configs):
             ls.append(label)
     
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
-    print(ls,ps)
+    print(ls,"\n",ps)
     print(f"F1 score: {f1_score(ls, ps)}")
     print("done!")
 

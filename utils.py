@@ -55,8 +55,8 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
 
     return prompts
 
-# https://kierszbaumsamuel.medium.com/f1-score-in-nlp-span-based-qa-task-5b115a5e7d41
-def f1_score(labels: str, preds: str, threshold = 0.0) -> float:
+# https://stackoverflow.com/questions/76802665/f1-score-and-accuracy-for-text-similarity
+def f1_score(labels: str, preds: str, threshold = 0.6) -> float:
     """
     Get f1_score comparing gold standard and prediction.
     """

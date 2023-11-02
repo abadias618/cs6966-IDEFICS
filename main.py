@@ -56,7 +56,7 @@ def run(configs):
     tbar_loader = tqdm(train_loader, dynamic_ncols=True)
     tbar_loader.set_description("train")
 
-    f1_scores_list = []
+    preds = []
     num_correct = 0
     for images, labels in tbar_loader:
         images = [to_pil_image(image) for image in images]
@@ -76,10 +76,9 @@ def run(configs):
             if label in pred:
                 num_correct += 1
                 
-            score = f1_score(label, pred.split('Assistant:')[-1])
-            f1_scores_list.append(score)
+            preds.append(pred.split('Assistant:')[-1].lower())
     
-    print(f"F1 score: {sum(f1_scores_list) / len(train_loader.dataset)}")
+    print(f"F1 score: {f1_score(labels, preds)}")
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
     print("done!")
 

@@ -5,4 +5,4 @@ torchvision
 configargparse
 python-dotenv
 namegenerator
-nltk
+levenshtein

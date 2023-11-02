@@ -1,7 +1,5 @@
 from PIL import Image
-import nltk
-nltk.download('punkt')
-from nltk.tokenize import word_tokenize
+from Levenshtein import distance
 from collections import Counter
 
 class CustomPipeline:
@@ -48,7 +46,7 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
     for image in images:
         prompts.append(
             [
-                "User: Classify this image in 1 to 2 words",# (preferably 1 word), then, give an explanation in 1 sentence of why you classified that way.",
+                "User: Classify this image in 1 word only.",# (preferably 1 word), then, give an explanation in 1 sentence of why you classified that way.",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",
@@ -58,24 +56,23 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
     return prompts
 
 # https://kierszbaumsamuel.medium.com/f1-score-in-nlp-span-based-qa-task-5b115a5e7d41
-def f1_score(gold: str, pred: str) -> float:
+def f1_score(labels: str, preds: str) -> float:
     """
     Get f1_score comparing gold standard and prediction.
     """
-    g_toks = word_tokenize(gold)
-    p_toks = word_tokenize(pred)
-    common = Counter(g_toks) & Counter(p_toks)
-    num_same = sum(common.values())
+    tp, fp, fn = 0, 0, 0
 
-    if len(g_toks) == 0 or len(p_toks) == 0:
-        # if either is empty then F1 is 1 if they agree, 0 otherwise.
-        return int(g_toks == p_toks)
+    for label, pred in zip(labels, preds):
+        similarity_score = 1 - distance(label, pred) / max(len(label), len(pred))
+        if similarity_score >= threshold:
+            tp += 1
+        else:
+            fp += 1
 
-    if num_same == 0:
-        return 0
-    
-    precision = 1.0 * num_same / len(p_toks)
-    recall = 1.0 * num_same / len(g_toks)
-    f1 = (2 * precision * recall) / (precision + recall)
+    fn = len(labels) - tp
 
-    return f1
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1_score = 2 * (precision * recall) / (precision + recall)
+
+    return f1_score

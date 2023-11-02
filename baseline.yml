@@ -1,0 +1,2 @@
+dataset-root: /scratch_nvme/jakobj/torchdata
+batch-size: 256 

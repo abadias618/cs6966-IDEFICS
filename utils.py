@@ -73,9 +73,6 @@ def f1_score(labels: str, preds: str, threshold = 0.0) -> float:
 
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
-    if recall + precision > 0:
-        f1_score = 2 * (precision * recall) / (precision + recall)
-    else:
-        f1_score = 0
+    f1_score = 2 * (precision * recall) / (precision + recall)
 
     return f1_score

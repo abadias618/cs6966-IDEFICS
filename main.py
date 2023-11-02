@@ -71,7 +71,7 @@ def run(configs):
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
             print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
-            priny("raw\n",pred)
+            print("raw\n",pred)
             # TODO: make better accuracy method
             #if label in pred:
             #    num_correct += 1

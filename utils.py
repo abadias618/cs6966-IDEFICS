@@ -75,7 +75,7 @@ def f1_score(gold: str, pred: str) -> float:
         return 0
     
     precision = 1.0 * num_same / len(p_toks)
-    recall = 1.0 * sum_same / len(g_toks)
+    recall = 1.0 * num_same / len(g_toks)
     f1 = (2 * precision * recall) / (precision + recall)
 
     return f1

@@ -57,6 +57,7 @@ def run(configs):
     tbar_loader.set_description("train")
 
     f1_scores_list = []
+    num_correct = 0
     for images, labels in tbar_loader:
         images = [to_pil_image(image) for image in images]
         labels = [dataset_classes[label] for label in labels]
@@ -71,15 +72,15 @@ def run(configs):
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
             print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
-            print("raw\n",pred)
             # TODO: make better accuracy method
-            #if label in pred:
-            #    num_correct += 1
-            threshold = 0.6
-            score = f1_score(label, pred.split('Assistant:')[1].split(":")[0])
+            if label in pred:
+                num_correct += 1
+                
+            score = f1_score(label, pred.split('Assistant:')[-1])
             f1_scores_list.append(score)
     
-    print(f"accuracy: {sum(f1_scores_list) / len(train_loader.dataset)}")
+    print(f"F1 score: {sum(f1_scores_list) / len(train_loader.dataset)}")
+    print(f"accuracy: {num_correct / len(train_loader.dataset)}")
     print("done!")
 
 

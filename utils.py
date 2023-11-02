@@ -36,25 +36,6 @@ class CustomPipeline:
         return out
 
 
-def get_batch_of_images():
-    """
-    temp function to get a batch of images
-    will be replaced with CIFAR10 dataset/dataloader
-    """
-
-    img_paths = [
-        "./images/cat.jpg",
-        "./images/dog.jpg",
-        "./images/car.jpg",
-        "./images/plane.jpg",
-        "./images/skier.jpg",
-    ]
-
-    images = [Image.open(img_path) for img_path in img_paths]
-
-    return images
-
-
 def make_batch_of_prompts(images: list[Image.Image]) -> list:
     """
     take in batch of images and make batch of text prompts

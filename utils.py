@@ -41,12 +41,12 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     """
     take in batch of images and make batch of text prompts
     """
-
+    labels_literal = ",".join(labels)
     prompts = []
     for image in images:
         prompts.append(
             [
-                f"User: choose one of the items of the following list to classify the image given:{",".join(labels)}",
+                f"User: choose one of the items of the following list to classify the image given: {labels_literal}",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",

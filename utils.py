@@ -48,7 +48,7 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
     for image in images:
         prompts.append(
             [
-                "User: Classify this image in 1 to 2 words"# (preferably 1 word), then, give an explanation in 1 sentence of why you classified that way.",
+                "User: Classify this image in 1 to 2 words",# (preferably 1 word), then, give an explanation in 1 sentence of why you classified that way.",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",

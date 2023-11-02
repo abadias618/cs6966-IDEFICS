@@ -1,4 +1,6 @@
 from PIL import Image
+import nltk
+nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 from collections import Counter
 

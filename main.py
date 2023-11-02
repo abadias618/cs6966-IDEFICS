@@ -65,7 +65,8 @@ def run(configs):
 
         # generate prompts around images
         # TODO: improve prompts
-        prompts = make_batch_of_prompts(images)
+        print("labels\n",",".join(labels))
+        prompts = make_batch_of_prompts(images, labels)
 
         # get model outputs
         outputs = pipeline(prompts)

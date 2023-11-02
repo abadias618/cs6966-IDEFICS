@@ -37,7 +37,7 @@ class CustomPipeline:
         return out
 
 
-def make_batch_of_prompts(images: list[Image.Image]) -> list:
+def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     """
     take in batch of images and make batch of text prompts
     """
@@ -46,7 +46,8 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
     for image in images:
         prompts.append(
             [
-                "User: Classify this image in 1 word only.",# (preferably 1 word), then, give an explanation in 1 sentence of why you classified that way.",
+                f"User: choose one of the items of the following list to classify the image given:
+                {",".join(labels)}",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",

@@ -66,12 +66,12 @@ def run(configs):
         # generate prompts around images
         # TODO: improve prompts
         print("labels\n",",".join(labels))
-        print("length preds",len(outputs))
+        
         prompts = make_batch_of_prompts(images, labels)
 
         # get model outputs
         outputs = pipeline(prompts)
-
+        print("length preds",len(outputs))
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
             print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
@@ -83,8 +83,7 @@ def run(configs):
             ls.append(label)
     
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
-    print(ls,"\n",ps)
-    print(f"F1 score: {f1_score(ls, ps)}")
+    print(f"F1 score: {f1_score(ls, ps, threshold=0.8)}")
     print("done!")
 
 

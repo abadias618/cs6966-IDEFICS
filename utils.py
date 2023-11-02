@@ -56,7 +56,7 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
     return prompts
 
 # https://kierszbaumsamuel.medium.com/f1-score-in-nlp-span-based-qa-task-5b115a5e7d41
-def f1_score(labels: str, preds: str, threshold = 0.5) -> float:
+def f1_score(labels: str, preds: str, threshold = 0.0) -> float:
     """
     Get f1_score comparing gold standard and prediction.
     """
@@ -73,6 +73,9 @@ def f1_score(labels: str, preds: str, threshold = 0.5) -> float:
 
     precision = tp / (tp + fp)
     recall = tp / (tp + fn)
-    f1_score = 2 * (precision * recall) / (precision + recall)
+    if recall + precision > 0:
+        f1_score = 2 * (precision * recall) / (precision + recall)
+    else:
+        f1_score = 0
 
     return f1_score

@@ -77,7 +77,7 @@ def run(configs):
                 num_correct += 1
                 
             preds.append(pred.split('Assistant:')[-1].lower())
-    
+    print(labels,preds)
     print(f"F1 score: {f1_score(labels, preds)}")
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
     print("done!")

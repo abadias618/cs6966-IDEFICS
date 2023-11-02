@@ -65,13 +65,10 @@ def run(configs):
 
         # generate prompts around images
         # TODO: improve prompts
-        print("labels\n",",".join(labels))
-        
         prompts = make_batch_of_prompts(images, labels)
 
         # get model outputs
         outputs = pipeline(prompts)
-        print("length preds",len(outputs))
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
             print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")

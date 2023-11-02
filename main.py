@@ -66,6 +66,7 @@ def run(configs):
         # generate prompts around images
         # TODO: improve prompts
         print("labels\n",",".join(labels))
+        print("length preds",len(outputs))
         prompts = make_batch_of_prompts(images, labels)
 
         # get model outputs

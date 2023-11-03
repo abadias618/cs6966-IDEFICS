@@ -1,5 +1,6 @@
 from PIL import Image
-
+from Levenshtein import distance
+from collections import Counter
 
 class CustomPipeline:
     def __init__(self, model, processor, configs):
@@ -36,16 +37,16 @@ class CustomPipeline:
         return out
 
 
-def make_batch_of_prompts(images: list[Image.Image]) -> list:
+def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     """
     take in batch of images and make batch of text prompts
     """
-
+    labels_literal = ",".join(labels)
     prompts = []
     for image in images:
         prompts.append(
             [
-                "User: What is in this image?",
+                f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in 1 sentence of why you chose that class.",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",
@@ -53,3 +54,25 @@ def make_batch_of_prompts(images: list[Image.Image]) -> list:
         )
 
     return prompts
+
+# https://stackoverflow.com/questions/76802665/f1-score-and-accuracy-for-text-similarity
+def f1_score(labels: str, preds: str, threshold = 0.0) -> float:
+    """
+    Get f1_score comparing gold standard and prediction.
+    """
+    tp, fp, fn = 0, 0, 0
+
+    for label, pred in zip(labels, preds):
+        similarity_score = 1 - distance(label, pred) / max(len(label), len(pred))
+        if similarity_score >= threshold:
+            tp += 1
+        else:
+            fp += 1
+
+    fn = len(labels) - tp
+
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1_score = 2 * (precision * recall) / (precision + recall)
+
+    return f1_score

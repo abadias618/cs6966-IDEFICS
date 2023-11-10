@@ -2,6 +2,7 @@ from PIL import Image
 from Levenshtein import distance
 from collections import Counter
 
+
 class CustomPipeline:
     def __init__(self, model, processor, configs):
         self.model = model
@@ -46,7 +47,7 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     for image in images:
         prompts.append(
             [
-                f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in 1 sentence of why you chose that class.",
+                f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",
@@ -55,8 +56,9 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
 
     return prompts
 
+
 # https://stackoverflow.com/questions/76802665/f1-score-and-accuracy-for-text-similarity
-def f1_score(labels: str, preds: str, threshold = 0.0) -> float:
+def f1_score(labels: str, preds: str, threshold=0.0) -> float:
     """
     Get f1_score comparing gold standard and prediction.
     """

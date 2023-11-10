@@ -5,5 +5,5 @@ seed: 13
 name: random
 checkpoint: HuggingFaceM4/idefics-9b-instruct
 batch-size: 5
-train-size: 30
+train-size: -1
 num-workers: 4

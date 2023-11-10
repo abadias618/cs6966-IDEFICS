@@ -9,7 +9,13 @@
 #SBATCH -o proj-%j.log
 
 source ~/miniconda3/etc/profile.d/conda.sh
-conda activate locexp
+conda activate le-proj
+
+export DOWNLOAD_DIR="/scratch/general/vast/$USER/huggingface_cache"
+export TRANSFORMERS_CACHE="/scratch/general/vast/$USER/huggingface_cache"
+export HF_DATASETS_CACHE="/scratch/general/vast/$USER/huggingface_cache"
+export TRANSFORMERS_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
 
 OUT_DIR=/scratch/general/vast/$USER/cs6966/proj/models
-python main.py -o ${OUT_DIR}
+ntfy $SLURM_JOB_ID python main.py -o ${OUT_DIR}

@@ -77,7 +77,7 @@ def run(configs):
                 corr.append(1)
             else:
                 corr.append(0)
-            
+
             # save images
             image.save(os.path.join(configs.output_dir, f"{img_count}.png"))
             img_count += 1
@@ -93,7 +93,7 @@ def run(configs):
     with open(os.path.join(configs.output_dir, "results.csv"), "w", encoding="utf-8") as file:
         file.write("num,label,prediction,correct\n")
         for i, (l, p, c) in enumerate(zip(ls, ps, corr)):
-            p = p.replace(",", "") # remove commas from predictions
+            p = p.replace(",", "")  # remove commas from predictions
             file.write(f"{i},{l},{p},{c}\n")
 
 
@@ -108,6 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("--train-size", type=int, default=-1, help="train dataset size (for development)")
     parser.add_argument("--batch-size", type=int, default=128, help="training batch size")
     parser.add_argument("--num-workers", type=int, default=4, help="number of workers for dataloader")
+    parser.add_argument("--max-length", type=int, default=250, help="max generation length")
     configs, _ = parser.parse_known_args()
 
     # set device

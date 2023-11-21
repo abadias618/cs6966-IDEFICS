@@ -1,6 +1,31 @@
 from PIL import Image
 from Levenshtein import distance
 from collections import Counter
+import random
+
+
+example_images = [
+    {
+        "image": Image.open("sample_images/automobile4.png"),
+        "label": "automobile",
+        "explanation": "the image is of an automobile because it has four wheels and only carries a few passengers.",
+    },
+    {
+        "image": Image.open("sample_images/ship7.png"),
+        "label": "ship",
+        "explanation": "the image is of a small boat which is a type of ship and because the object is floating on water.",
+    },
+    {
+        "image": Image.open("sample_images/deer7.png"),
+        "label": "deer",
+        "explanation": "the image is of a deer because it is a brown animal with four legs and antlers.",
+    },
+    {
+        "image": Image.open("sample_images/horse5.png"),
+        "label": "horse",
+        "explanation": "the image is of a horse because it is an animal with four legs and a mane and long tail.",
+    },
+]
 
 
 class CustomPipeline:
@@ -29,7 +54,7 @@ class CustomPipeline:
             **inputs,
             eos_token_id=exit_condition,
             bad_words_ids=bad_words_ids,
-            max_length=100,
+            max_length=self.configs.max_length,
         )
 
         # postprocess outputs
@@ -43,34 +68,47 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
     take in batch of images and make batch of text prompts
     """
     labels_literal = ",".join(labels)
+
+    # load sample images
+    random.shuffle(example_images)
+    two_sample_images = example_images[:2]
+
     prompts = []
     for image in images:
-        prompts.append(
-            ## prompt one: 
+        inst_prompt = []
 
-            # [
-            #     f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
-            #     image,
-            #     "<end_of_utterance>",
-            #     "\nAssistant:",
-            # ]
+        # load two sample images
+        for sample in two_sample_images:
+            inst_prompt.extend(
+                [
+                    f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+                    sample["image"],
+                    "<end_of_utterance>",
+                    f"\nAssistant: {sample['label']}, {sample['explanation']} <end_of_utterance>",
+                ]
+            )
 
+        inst_prompt.extend(
+            ## prompt one:
             [
-                f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+                f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
                 image,
                 "<end_of_utterance>",
                 "\nAssistant:",
             ]
-
+            # [
+            #     f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+            #     image,
+            #     "<end_of_utterance>",
+            #     "\nAssistant:",
+            # ]
             ## prompt two:
-
             # [
             #     f"User: Classify this image in one word only, then give an explanation of why you chose to classify the image in that way.",
             #     image,
             #     "<end_of_utterance>",
             #     "\nAssistant:",
             # ]
-
             # [
             #     f"User: Classify this image in one word only.",
             #     image,
@@ -78,6 +116,8 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
             #     "\nAssistant:",
             # ]
         )
+
+        prompts.append(inst_prompt)
 
     return prompts
 

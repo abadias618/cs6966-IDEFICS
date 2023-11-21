@@ -39,7 +39,7 @@ def run(configs):
         train_dataset = torch.utils.data.Subset(train_dataset, np.arange(configs.train_size))
 
     train_loader = DataLoader(
-        train_dataset, configs.batch_size, shuffle=True, num_workers=configs.num_workers, pin_memory=True
+        train_dataset, configs.batch_size, shuffle=False, num_workers=configs.num_workers, pin_memory=True
     )
     val_loader = DataLoader(val_dataset, configs.batch_size, num_workers=configs.num_workers, pin_memory=True)
 
@@ -57,7 +57,8 @@ def run(configs):
 
     ps = []
     ls = []
-    num_correct = 0
+    corr = []
+    img_count = 0
     for images, labels in tbar_loader:
         images = [to_pil_image(image) for image in images]
         labels = [dataset_classes[label] for label in labels]
@@ -69,18 +70,31 @@ def run(configs):
         # get model outputs
         outputs = pipeline(prompts)
         # compare outputs with targets
-        for pred, label in zip(outputs, labels):
+        for pred, label, image in zip(outputs, labels, images):
             # print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
             # TODO: make better accuracy method
             if label in pred.split("Assistant:")[-1].strip().lower():
-                num_correct += 1
+                corr.append(1)
+            else:
+                corr.append(0)
+            
+            # save images
+            image.save(os.path.join(configs.output_dir, f"{img_count}.png"))
+            img_count += 1
 
             ps.append(pred.split("Assistant:")[-1].strip().lower())
             ls.append(label)
 
-    print(f"accuracy: {num_correct / len(train_loader.dataset)}")
+    print(f"accuracy: {sum(corr) / len(train_loader.dataset)}")
     # print(f"F1 score: {f1_score(ls, ps, threshold=0.8)}")
     print("done!")
+
+    # save ps, ls, corr as csv
+    with open(os.path.join(configs.output_dir, "results.csv"), "w", encoding="utf-8") as file:
+        file.write("num,label,prediction,correct\n")
+        for i, (l, p, c) in enumerate(zip(ls, ps, corr)):
+            p = p.replace(",", "") # remove commas from predictions
+            file.write(f"{i},{l},{p},{c}\n")
 
 
 if __name__ == "__main__":
@@ -104,6 +118,8 @@ if __name__ == "__main__":
         configs.name = namegenerator.gen()
     else:
         configs.name = configs.name
+
+    print(f"run name: {configs.name}")
 
     # set seed
     if configs.seed:

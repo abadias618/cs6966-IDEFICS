@@ -28,6 +28,7 @@ example_images = [
 ]
 
 
+
 class CustomPipeline:
     def __init__(self, model, processor, configs):
         self.model = model

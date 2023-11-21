@@ -96,7 +96,6 @@ def run(configs):
             p = p.replace(",", "")  # remove commas from predictions
             file.write(f"{i},{l},{p},{c}\n")
 
-
 if __name__ == "__main__":
     # parse args/config file
     parser = configargparse.ArgParser(default_config_files=["./config.yml"])

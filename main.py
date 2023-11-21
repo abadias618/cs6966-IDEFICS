@@ -6,7 +6,6 @@ import namegenerator
 import numpy as np
 import torch
 import yaml
-from dotenv import load_dotenv
 from torch.utils.data.dataloader import DataLoader
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
@@ -71,23 +70,20 @@ def run(configs):
         outputs = pipeline(prompts)
         # compare outputs with targets
         for pred, label in zip(outputs, labels):
-            print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
+            # print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
             # TODO: make better accuracy method
-            if label in pred.split('Assistant:')[-1].strip().lower():
+            if label in pred.split("Assistant:")[-1].strip().lower():
                 num_correct += 1
-                
-            ps.append(pred.split('Assistant:')[-1].strip().lower())
+
+            ps.append(pred.split("Assistant:")[-1].strip().lower())
             ls.append(label)
-    
+
     print(f"accuracy: {num_correct / len(train_loader.dataset)}")
-    print(f"F1 score: {f1_score(ls, ps, threshold=0.8)}")
+    # print(f"F1 score: {f1_score(ls, ps, threshold=0.8)}")
     print("done!")
 
 
 if __name__ == "__main__":
-    # load environment variables
-    load_dotenv()
-
     # parse args/config file
     parser = configargparse.ArgParser(default_config_files=["./config.yml"])
     parser.add_argument("-c", "--config", is_config_file=True, default="./config.yml", help="config file location")

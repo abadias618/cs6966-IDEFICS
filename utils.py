@@ -81,10 +81,11 @@ def make_batch_of_prompts(images: list[Image.Image], labels) -> list:
         for sample in two_sample_images:
             inst_prompt.extend(
                 [
-                    f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+                    f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
                     sample["image"],
                     "<end_of_utterance>",
                     f"\nAssistant: {sample['label']}, {sample['explanation']} <end_of_utterance>",
+                    # f"\nAssistant: {sample['label']} <end_of_utterance>",
                 ]
             )
 

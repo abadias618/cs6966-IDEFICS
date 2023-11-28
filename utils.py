@@ -119,46 +119,46 @@ def make_batch_of_prompts(images: list[Image.Image], labels, prompt_type) -> lis
                         ]
                     )
 
-            ## prompt one:
-            match prompt_type:
-                case "pre-wx":
-                    inst_prompt.extend(
-                        [
-                            f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
-                            image,
-                            "<end_of_utterance>",
-                            "\nAssistant:",
-                        ]
-                    )
-                case "pre-wox":
-                    inst_prompt.extend(
-                        [
-                            f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
-                            image,
-                            "<end_of_utterance>",
-                            "\nAssistant:",
-                        ]
-                    )
-                case "cot-wx":
-                    raise NotImplementedError("cot-wx not implemented yet")
-                case "nolabs-wx":
-                    inst_prompt.extend(
-                        [
-                            "User: Classify this image in one word only, then give an explanation of why you chose to classify the image in that way.",
-                            image,
-                            "<end_of_utterance>",
-                            "\nAssistant:",
-                        ]
-                    )
-                case "nolabs-wox":
-                    inst_prompt.extend(
-                        [
-                            "User: Classify this image in one word only.",
-                            image,
-                            "<end_of_utterance>",
-                            "\nAssistant:",
-                        ]
-                    )
+        ## prompt one:
+        match prompt_type:
+            case "pre-wx":
+                inst_prompt.extend(
+                    [
+                        f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
+                        image,
+                        "<end_of_utterance>",
+                        "\nAssistant:",
+                    ]
+                )
+            case "pre-wox":
+                inst_prompt.extend(
+                    [
+                        f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+                        image,
+                        "<end_of_utterance>",
+                        "\nAssistant:",
+                    ]
+                )
+            case "cot-wx":
+                raise NotImplementedError("cot-wx not implemented yet")
+            case "nolabs-wx":
+                inst_prompt.extend(
+                    [
+                        "User: Classify this image in one word only, then give an explanation of why you chose to classify the image in that way.",
+                        image,
+                        "<end_of_utterance>",
+                        "\nAssistant:",
+                    ]
+                )
+            case "nolabs-wox":
+                inst_prompt.extend(
+                    [
+                        "User: Classify this image in one word only.",
+                        image,
+                        "<end_of_utterance>",
+                        "\nAssistant:",
+                    ]
+                )
 
         prompts.append(inst_prompt)
 

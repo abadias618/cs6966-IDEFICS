@@ -5,7 +5,7 @@ seed: 13
 name: random
 checkpoint: HuggingFaceM4/idefics-9b-instruct
 batch-size: 5
-train-size: 1000 # controls training set size
+train-size: 5000 # controls training set size
 num-workers: 4
 max-length: 300
 prompt-type: pre-wx

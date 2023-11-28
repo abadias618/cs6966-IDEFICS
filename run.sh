@@ -1,11 +1,12 @@
 #!/bin/bash
-#SBATCH --account soc-gpu-np
-#SBATCH --partition soc-gpu-np
-#SBATCH --ntasks-per-node=32
+#SBATCH --account owner-gpu-guest
+#SBATCH --partition notchpeak-gpu-guest
+#SBATCH --ntasks=16
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
-#SBATCH --time=0:20:00
-#SBATCH --mem=65GB
+#SBATCH --constraint="p40|a40|a100|a6000|3090"
+#SBATCH --time=0:45:00
+#SBATCH --mem=30GB
 #SBATCH -o proj-%j.log
 
 source ~/miniconda3/etc/profile.d/conda.sh

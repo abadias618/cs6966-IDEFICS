@@ -13,7 +13,7 @@ from torchvision.transforms.functional import to_pil_image
 from tqdm import tqdm
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
-from utils import CustomPipeline, make_batch_of_prompts, f1_score
+from utils import CustomPipeline, f1_score, make_batch_of_prompts
 
 
 def run(configs):
@@ -58,19 +58,19 @@ def run(configs):
     ps = []
     ls = []
     corr = []
-    img_count = 0
+    # img_count = 0
     for images, labels in tbar_loader:
         images = [to_pil_image(image) for image in images]
         labels = [dataset_classes[label] for label in labels]
 
         # generate prompts around images
         # TODO: improve prompts
-        prompts = make_batch_of_prompts(images, labels)
+        prompts = make_batch_of_prompts(images, labels, configs.prompt_type)
 
         # get model outputs
         outputs = pipeline(prompts)
         # compare outputs with targets
-        for pred, label, image in zip(outputs, labels, images):
+        for pred, label, _ in zip(outputs, labels, images):
             # print(f"target: {label}\npredicted: {pred.split('Assistant:')[-1]}")
             # TODO: make better accuracy method
             if label in pred.split("Assistant:")[-1].strip().lower():
@@ -79,8 +79,8 @@ def run(configs):
                 corr.append(0)
 
             # save images
-            image.save(os.path.join(configs.output_dir, f"{img_count}.png"))
-            img_count += 1
+            # image.save(os.path.join(configs.output_dir, f"{img_count}.png"))
+            # img_count += 1
 
             ps.append(pred.split("Assistant:")[-1].strip().lower())
             ls.append(label)
@@ -96,6 +96,7 @@ def run(configs):
             p = p.replace(",", "")  # remove commas from predictions
             file.write(f"{i},{l},{p},{c}\n")
 
+
 if __name__ == "__main__":
     # parse args/config file
     parser = configargparse.ArgParser(default_config_files=["./config.yml"])
@@ -108,6 +109,13 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=128, help="training batch size")
     parser.add_argument("--num-workers", type=int, default=4, help="number of workers for dataloader")
     parser.add_argument("--max-length", type=int, default=250, help="max generation length")
+    parser.add_argument(
+        "--prompt-type",
+        type=str,
+        default="pre-wx",
+        help="prompt type",
+        choices=["pre-wx", "cot-wx", "nolabs-wx", "pre-wox", "nolabs-wox"],
+    )
     configs, _ = parser.parse_known_args()
 
     # set device

@@ -27,6 +27,29 @@ example_images = [
     },
 ]
 
+cot_example_images = [
+    {
+        "image": Image.open("sample_images/automobile4.png"),
+        "label": "automobile",
+        "explanation": "The image is of a vehicle with four wheels. It is small, so it is an automobile.",
+    },
+    {
+        "image": Image.open("sample_images/ship7.png"),
+        "label": "ship",
+        "explanation": "Because the object is floating on water and can carry a person or cargo, it is a ship.",
+    },
+    {
+        "image": Image.open("sample_images/deer7.png"),
+        "label": "deer",
+        "explanation": "The image is of a brown animal with four legs and antlers. It is a deer.",
+    },
+    {
+        "image": Image.open("sample_images/horse5.png"),
+        "label": "horse",
+        "explanation": "The image is of a brown animal with four legs and a mane and long tail. It is a horse.",
+    },
+]
+
 
 class CustomPipeline:
     def __init__(self, model, processor, configs):
@@ -71,53 +94,62 @@ def make_batch_of_prompts(images: list[Image.Image], labels, prompt_type) -> lis
 
     # load sample images
     random.shuffle(example_images)
-    two_sample_images = example_images[:2]
+    random.shuffle(cot_example_images)
 
     prompts = []
     for image in images:
         inst_prompt = []
 
         # load two sample images
-        for sample in two_sample_images:
-            match prompt_type:
-                case "pre-wx":
-                    inst_prompt.extend(
-                        [
-                            f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
-                            sample["image"],
-                            "<end_of_utterance>",
-                            f"\nAssistant: {sample['label']}, {sample['explanation']} <end_of_utterance>",
-                        ]
-                    )
-                case "pre-wox":
-                    inst_prompt.extend(
-                        [
-                            f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
-                            sample["image"],
-                            "<end_of_utterance>",
-                            f"\nAssistant: {sample['label']} <end_of_utterance>",
-                        ]
-                    )
-                case "cot-wx":
-                    raise NotImplementedError("cot-wx not implemented yet")
-                case "nolabs-wx":
-                    inst_prompt.extend(
-                        [
-                            "User: Classify this image in one word only, then give an explanation of why you chose to classify the image in that way.",
-                            sample["image"],
-                            "<end_of_utterance>",
-                            f"\nAssistant: {sample['explanation']} <end_of_utterance>",
-                        ]
-                    )
-                case "nolabs-wox":
-                    inst_prompt.extend(
-                        [
-                            "User: Classify this image in one word only.",
-                            sample["image"],
-                            "<end_of_utterance>",
-                            "<end_of_utterance>",
-                        ]
-                    )
+        if prompt_type != "cot":
+            for sample in example_images[:2]:
+                match prompt_type:
+                    case "pre-wx":
+                        inst_prompt.extend(
+                            [
+                                f"User: choose one of the items of the following list to classify the image given: {labels_literal}. Afterwards, give an explanation in one sentence of why you chose that class.",
+                                sample["image"],
+                                "<end_of_utterance>",
+                                f"\nAssistant: {sample['label']}, {sample['explanation']} <end_of_utterance>",
+                            ]
+                        )
+                    case "pre-wox":
+                        inst_prompt.extend(
+                            [
+                                f"User: choose one of the items of the following list to classify the image given: {labels_literal}.",
+                                sample["image"],
+                                "<end_of_utterance>",
+                                f"\nAssistant: {sample['label']} <end_of_utterance>",
+                            ]
+                        )
+                    case "nolabs-wx":
+                        inst_prompt.extend(
+                            [
+                                "User: Classify this image in one word only, then give an explanation of why you chose to classify the image in that way.",
+                                sample["image"],
+                                "<end_of_utterance>",
+                                f"\nAssistant: {sample['label']}, {sample['explanation']} <end_of_utterance>",
+                            ]
+                        )
+                    case "nolabs-wox":
+                        inst_prompt.extend(
+                            [
+                                "User: Classify this image in one word only.",
+                                sample["image"],
+                                "<end_of_utterance>",
+                                f"\nAssistant: {sample['label']}, <end_of_utterance>",
+                            ]
+                        )
+        # else:
+        #     for sample in cot_example_images[:2]:
+        #         inst_prompt.extend(
+        #                     [
+        #                         f"User: Classify this image in one word only and explain why you chose that class step-by-step. Possible class choices are {labels_literal}.",
+        #                         sample["image"],
+        #                         "<end_of_utterance>",
+        #                         f"\nAssistant: Let's think this through step-by-step. {sample['explanation']} <end_of_utterance>",
+        #                     ]
+        #                 )
 
         ## prompt one:
         match prompt_type:
@@ -139,8 +171,15 @@ def make_batch_of_prompts(images: list[Image.Image], labels, prompt_type) -> lis
                         "\nAssistant:",
                     ]
                 )
-            case "cot-wx":
-                raise NotImplementedError("cot-wx not implemented yet")
+            case "cot":
+                inst_prompt.extend(
+                        [
+                            f"User: Classify this image in one word only and explain why you chose that class step-by-step. Possible class choices are {labels_literal}.",
+                            image,
+                            "<end_of_utterance>",
+                            "\nAssistant: Let's think this through step-by-step.",
+                        ]
+                    )
             case "nolabs-wx":
                 inst_prompt.extend(
                     [

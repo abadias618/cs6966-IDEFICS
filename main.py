@@ -13,7 +13,7 @@ from torchvision.transforms.functional import to_pil_image
 from tqdm import tqdm
 from transformers import AutoProcessor, IdeficsForVisionText2Text
 
-from utils import CustomPipeline, f1_score, make_batch_of_prompts
+from utils import CustomPipeline, make_batch_of_prompts
 
 
 def run(configs):
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         type=str,
         default="pre-wx",
         help="prompt type",
-        choices=["pre-wx", "cot-wx", "nolabs-wx", "pre-wox", "nolabs-wox"],
+        choices=["pre-wx", "cot", "nolabs-wx", "pre-wox", "nolabs-wox"],
     )
     configs, _ = parser.parse_known_args()
 
